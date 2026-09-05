@@ -1,4 +1,5 @@
 from account import create_account
+accounts={}
 
 print("=" * 50)
 print("                 SAVALIYA ONE")
@@ -13,7 +14,7 @@ choice = input("\nEnter your choice: ")
 print("\nYou selected:", choice)
 
 if(choice=="1"):
-    create_account()
+    account=create_account()
 
 elif(choice=="2"):
     print("\n--- LOGIN ---")
