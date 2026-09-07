@@ -1,4 +1,4 @@
-from account import create_account
+from create_account import create_account, login
 accounts={}
 
 print("=" * 50)
@@ -17,8 +17,7 @@ if(choice=="1"):
     account=create_account()
 
 elif(choice=="2"):
-    print("\n--- LOGIN ---")
-    print("Login selected.")
+    login()
 elif(choice=="3"):
     print("\nThanks for choosing SAVALIYA ONE :)")
 else:

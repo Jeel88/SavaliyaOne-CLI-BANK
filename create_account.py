@@ -24,3 +24,21 @@ def create_account():
     print("Account Number:", account_number)
 
     return account_number
+
+def login():
+    print("\n--- LOGIN ---")
+
+    account_number = int(input("Enter account number: "))
+    pin = input("Enter PIN: ")
+
+    if account_number in accounts:
+        if accounts[account_number]["pin"] == pin:
+            print("\nLogin successful!")
+            print("Welcome,", accounts[account_number]["name"])
+            return account_number
+        else:
+            print("\nIncorrect PIN.")
+    else:
+        print("\nAccount not found.")
+
+    return None
