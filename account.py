@@ -42,3 +42,17 @@ def login():
         print("\nAccount not found.")
 
     return None
+
+def credit_money(account_number):
+    print("\n--- CREDIT MONEY ---")
+
+    amount = float(input("Enter amount to credit: ₹"))
+
+    if amount <= 0:
+        print("\nAmount must be greater than 0.")
+        return
+
+    accounts[account_number]["balance"] += amount
+
+    print("\n₹", amount, "credited successfully!")
+    print("New Balance: ₹", accounts[account_number]["balance"])

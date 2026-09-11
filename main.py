@@ -1,4 +1,4 @@
-from account import create_account, login, accounts
+from account import create_account, login, accounts , credit_money
 accounts={}
 
 print("=" * 50)
@@ -35,7 +35,7 @@ elif(choice=="2"):
                     )
 
             elif dashboard_choice == "2":
-                print("\nCredit Money")
+                credit_money(logged_in_account)
 
             elif dashboard_choice == "3":
                 print("\nDebit Money")
