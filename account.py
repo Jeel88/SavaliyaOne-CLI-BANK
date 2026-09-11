@@ -1,32 +1,56 @@
+from database import (
+    insert_account,
+    get_next_account_number,
+    get_account,
+    update_balance,
+    insert_transaction,
+    get_transactions,
+    update_pin,
+    transfer_funds
+)
+
 accounts = {}
 transactions = {}
 
-def generate_account_number():
-    if len(accounts)==0:
-        return 1001
-
-    return max(accounts) + 1
 
 def create_account():
-    print("\n-------Create Account-------")
-    name=input("\nEnter your name: ")
-    age=int(input("Enter your age: "))
+    print("\n------- Create Account -------")
+
+    name = input("\nEnter your name: ")
+    age = int(input("Enter your age: "))
     deposit = float(input("Enter initial deposit: ₹"))
     pin = input("Create a 4-digit PIN: ")
-    account_number = generate_account_number()
 
+    account_number = get_next_account_number()
 
-    account={"name":name,
-             "age":age,
-             "deposit":deposit,
-             "pin":pin}
-    accounts[account_number] = account
-    transactions[account_number] = []
+    insert_account(
+        account_number,
+        name,
+        age,
+        pin,
+        deposit
+    )
+
+    if deposit > 0:
+        insert_transaction(
+            account_number,
+            "Initial Deposit",
+            deposit
+        )
+
+    accounts[account_number] = {
+        "name": name,
+        "age": age,
+        "balance": deposit,
+        "pin": pin
+    }
 
     print("\nAccount created successfully!")
     print("Account Number:", account_number)
+    print("Initial Balance: ₹", deposit)
 
     return account_number
+
 
 def login():
     print("\n--- LOGIN ---")
@@ -34,17 +58,44 @@ def login():
     account_number = int(input("Enter account number: "))
     pin = input("Enter PIN: ")
 
-    if account_number in accounts:
-        if accounts[account_number]["pin"] == pin:
-            print("\nLogin successful!")
-            print("Welcome,", accounts[account_number]["name"])
-            return account_number
-        else:
-            print("\nIncorrect PIN.")
-    else:
-        print("\nAccount not found.")
+    account = get_account(account_number)
 
-    return None
+    if account is None:
+        print("\nAccount not found.")
+        return None
+
+    name = account[0]
+    age = account[1]
+    stored_pin = account[2]
+    balance = account[3]
+
+    if stored_pin == pin:
+        print("\nLogin successful!")
+        print("Welcome,", name)
+
+        accounts[account_number] = {
+            "name": name,
+            "age": age,
+            "balance": balance,
+            "pin": stored_pin
+        }
+
+        return account_number
+    else:
+        print("\nIncorrect PIN.")
+        return None
+
+
+def check_balance(account_number):
+    print("\n--- CHECK BALANCE ---")
+    account = get_account(account_number)
+    if account:
+        balance = account[3]
+        accounts[account_number]["balance"] = balance
+        print("Current Balance: ₹", balance)
+    else:
+        print("Account not found.")
+
 
 def credit_money(account_number):
     print("\n--- CREDIT MONEY ---")
@@ -55,16 +106,25 @@ def credit_money(account_number):
         print("\nAmount must be greater than 0.")
         return
 
-    accounts[account_number]["balance"] += amount
-    transactions[account_number].append({
-        "type": "Credit",
-        "amount": amount })
+    account = get_account(account_number)
+    current_balance = account[3]
+
+    new_balance = current_balance + amount
+
+    update_balance(account_number, new_balance)
+    insert_transaction(account_number, "Credit", amount)
+
+    accounts[account_number]["balance"] = new_balance
 
     print("\n₹", amount, "credited successfully!")
-    print("New Balance: ₹", accounts[account_number]["balance"])
+    print("New Balance: ₹", new_balance)
+
 
 def debit_money(account_number):
     print("\n--- DEBIT MONEY ---")
+
+    account = get_account(account_number)
+    current_balance = account[3]
 
     amount = float(input("Enter amount to debit: ₹"))
 
@@ -72,36 +132,117 @@ def debit_money(account_number):
         print("\nAmount must be greater than 0.")
         return
 
-    if amount > accounts[account_number]["balance"]:
+    if amount > current_balance:
         print("\nInsufficient balance.")
         return
 
-    accounts[account_number]["balance"] -= amount
-    transactions[account_number].append({
-        "type": "Debit",
-        "amount": amount })
+    new_balance = current_balance - amount
+
+    update_balance(account_number, new_balance)
+    insert_transaction(account_number, "Debit", amount)
+
+    accounts[account_number]["balance"] = new_balance
 
     print("\n₹", amount, "debited successfully!")
-    print("New Balance: ₹", accounts[account_number]["balance"])    
+    print("New Balance: ₹", new_balance)
+
+
+def transfer_money(account_number):
+    print("\n--- TRANSFER MONEY ---")
+
+    account = get_account(account_number)
+    current_balance = account[3]
+
+    receiver_acc = int(input("Enter recipient account number: "))
+
+    if receiver_acc == account_number:
+        print("\nYou cannot transfer money to your own account.")
+        return
+
+    receiver = get_account(receiver_acc)
+    if receiver is None:
+        print("\nRecipient account not found.")
+        return
+
+    print("Recipient Name:", receiver[0])
+    amount = float(input("Enter transfer amount: ₹"))
+
+    if amount <= 0:
+        print("\nAmount must be greater than 0.")
+        return
+
+    if amount > current_balance:
+        print("\nInsufficient balance.")
+        return
+
+    transfer_funds(account_number, receiver_acc, amount)
+
+    accounts[account_number]["balance"] = current_balance - amount
+
+    print("\n₹", amount, "transferred successfully to Account #", receiver_acc)
+    print("Remaining Balance: ₹", accounts[account_number]["balance"])
+
 
 def transaction_history(account_number):
     print("\n--- TRANSACTION HISTORY ---")
 
-    if len(transactions[account_number]) == 0:
+    transaction_list = get_transactions(account_number)
+
+    if len(transaction_list) == 0:
         print("No transactions yet.")
         return
 
-    for transaction in transactions[account_number]:
-        print("Type:", transaction["type"])
-        print("Amount: ₹", transaction["amount"])
+    for transaction in transaction_list:
+        print("Type:", transaction[0])
+        print("Amount: ₹", transaction[1])
         print("-------------------------")
+
 
 def account_details(account_number):
     print("\n--- ACCOUNT DETAILS ---")
 
-    account = accounts[account_number]
+    account = get_account(account_number)
+    if account:
+        name = account[0]
+        age = account[1]
+        balance = account[3]
 
-    print("Account Number:", account_number)
-    print("Name:", account["name"])
-    print("Age:", account["age"])
-    print("Balance: ₹", account["balance"])            
+        print("Account Number:", account_number)
+        print("Name:", name)
+        print("Age:", age)
+        print("Balance: ₹", balance)
+
+
+def account_analytics(account_number):
+    print("\n--- TRANSACTION ANALYTICS ---")
+
+    transaction_list = get_transactions(account_number)
+
+    if len(transaction_list) == 0:
+        print("No transactions available for analysis.")
+        return
+
+    total_txns = len(transaction_list)
+    total_amount = sum(t[1] for t in transaction_list)
+
+    print("Total Transactions:", total_txns)
+    print("Total Transaction Volume: ₹", total_amount)
+
+
+def change_pin(account_number):
+    print("\n--- CHANGE PIN ---")
+
+    account = get_account(account_number)
+    if not account:
+        print("Account not found.")
+        return
+
+    current_pin = input("Enter current 4-digit PIN: ")
+    if current_pin != account[2]:
+        print("\nIncorrect current PIN.")
+        return
+
+    new_pin = input("Enter new 4-digit PIN: ")
+    update_pin(account_number, new_pin)
+    accounts[account_number]["pin"] = new_pin
+    print("\nPIN updated successfully!")
