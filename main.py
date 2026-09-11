@@ -1,4 +1,4 @@
-from account import create_account, login, accounts , credit_money , debit_money, transaction_history
+from account import create_account, login, accounts , credit_money , debit_money, transaction_history,account_details
 
 print("=" * 50)
 print("                 SAVALIYA ONE")
@@ -40,10 +40,7 @@ while True:
                     debit_money(logged_in_account)
 
                 elif dashboard_choice == "4":
-                    print("\nAccount Number:", logged_in_account)
-                    print("Name:", accounts[logged_in_account]["name"])
-                    print("Age:", accounts[logged_in_account]["age"])
-                    print("Balance: ₹", accounts[logged_in_account]["deposit"])
+                    account_details(logged_in_account)
 
                 elif dashboard_choice == "5":
                     transaction_history(logged_in_account)

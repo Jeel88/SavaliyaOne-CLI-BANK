@@ -94,4 +94,14 @@ def transaction_history(account_number):
     for transaction in transactions[account_number]:
         print("Type:", transaction["type"])
         print("Amount: ₹", transaction["amount"])
-        print("-------------------------")    
+        print("-------------------------")
+
+def account_details(account_number):
+    print("\n--- ACCOUNT DETAILS ---")
+
+    account = accounts[account_number]
+
+    print("Account Number:", account_number)
+    print("Name:", account["name"])
+    print("Age:", account["age"])
+    print("Balance: ₹", account["balance"])            
