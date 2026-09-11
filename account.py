@@ -83,3 +83,15 @@ def debit_money(account_number):
 
     print("\n₹", amount, "debited successfully!")
     print("New Balance: ₹", accounts[account_number]["balance"])    
+
+def transaction_history(account_number):
+    print("\n--- TRANSACTION HISTORY ---")
+
+    if len(transactions[account_number]) == 0:
+        print("No transactions yet.")
+        return
+
+    for transaction in transactions[account_number]:
+        print("Type:", transaction["type"])
+        print("Amount: ₹", transaction["amount"])
+        print("-------------------------")    
