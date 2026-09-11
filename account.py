@@ -1,4 +1,6 @@
 accounts = {}
+transactions = {}
+
 def generate_account_number():
     if len(accounts)==0:
         return 1001
@@ -19,6 +21,7 @@ def create_account():
              "deposit":deposit,
              "pin":pin}
     accounts[account_number] = account
+    transactions[account_number] = []
 
     print("\nAccount created successfully!")
     print("Account Number:", account_number)
@@ -53,6 +56,9 @@ def credit_money(account_number):
         return
 
     accounts[account_number]["balance"] += amount
+    transactions[account_number].append({
+        "type": "Credit",
+        "amount": amount })
 
     print("\n₹", amount, "credited successfully!")
     print("New Balance: ₹", accounts[account_number]["balance"])
@@ -71,6 +77,9 @@ def debit_money(account_number):
         return
 
     accounts[account_number]["balance"] -= amount
+    transactions[account_number].append({
+        "type": "Debit",
+        "amount": amount })
 
     print("\n₹", amount, "debited successfully!")
     print("New Balance: ₹", accounts[account_number]["balance"])    
