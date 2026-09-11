@@ -56,3 +56,21 @@ def credit_money(account_number):
 
     print("\n₹", amount, "credited successfully!")
     print("New Balance: ₹", accounts[account_number]["balance"])
+
+def debit_money(account_number):
+    print("\n--- DEBIT MONEY ---")
+
+    amount = float(input("Enter amount to debit: ₹"))
+
+    if amount <= 0:
+        print("\nAmount must be greater than 0.")
+        return
+
+    if amount > accounts[account_number]["balance"]:
+        print("\nInsufficient balance.")
+        return
+
+    accounts[account_number]["balance"] -= amount
+
+    print("\n₹", amount, "debited successfully!")
+    print("New Balance: ₹", accounts[account_number]["balance"])    
